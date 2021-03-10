@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sort"
 	"syscall"
 	"text/template"
 )
@@ -409,6 +410,30 @@ func trim(s string) string {
 	return strings.TrimSpace(s)
 }
 
+// sortStrings returns a sorted array of strings
+func sortStrings(values []string) []string {
+    sort.Strings(values)
+    return values
+}
+
+// sortObjects returns a sorted array of objects (sorted by object key field)
+func sortObjects(objs interface{}, key string) (interface{}, error) {
+    objsVal, err := getArrayValues("sortObj", objs)
+    if err != nil {
+        return nil, err
+    }
+    data := make([]interface{}, objsVal.Len())
+    for i := 0; i < objsVal.Len(); i++ {
+        data[i] = objsVal.Index(i).Interface()
+    }
+    sort.Slice(data, func(i, j int) bool {
+        a := reflect.ValueOf(deepGet(data[i], key)).Interface().(string)
+        b := reflect.ValueOf(deepGet(data[j], key)).Interface().(string)
+        return a < b
+    })
+    return data, nil
+}
+
 // when returns the trueValue when the condition is true and the falseValue otherwise
 func when(condition bool, trueValue, falseValue interface{}) interface{} {
 	if condition {
@@ -447,6 +472,8 @@ func newTemplate(name string) *template.Template {
 		"trimPrefix":             trimPrefix,
 		"trimSuffix":             trimSuffix,
 		"trim":                   trim,
+		"sortStrings":            sortStrings,
+		"sortObjects":            sortObjects,
 		"when":                   when,
 		"where":                  where,
 		"whereNot":               whereNot,
