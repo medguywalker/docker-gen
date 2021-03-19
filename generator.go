@@ -375,6 +375,8 @@ func (g *generator) getContainers() ([]*RuntimeContainer, error) {
 			},
 			State: State{
 				Running: container.State.Running,
+				CreatedAt: container.State.StartedAt,
+				FinishedAt: container.State.FinishedAt,
 			},
 			Name:         strings.TrimLeft(container.Name, "/"),
 			Hostname:     container.Config.Hostname,

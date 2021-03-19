@@ -79,6 +79,8 @@ type Volume struct {
 
 type State struct {
 	Running bool
+	StartedAt string
+	FinishedAt string
 }
 
 type RuntimeContainer struct {
